@@ -5,7 +5,7 @@
 // @author         wtrx005 and moopet
 // @copyright      2011+, wtrx005 (https://userscripts-mirror.org/users/370514) | moopet (https://userscripts-mirror.org/users/34917)
 // @description    This script views a button in the search result on ebay to add the item directly to your watch list. based on ebay-watch-list from moopet i make this workaround for tld .at and .de! again special thanks to moopet!
-// @version        2012.07.09
+// @version        2019.01.12
 // @website        https://userscripts-mirror.org/scripts/show/110841
 // @include        https://*.ebay.com/*
 // @include        https://*.ebay.co.uk/*
@@ -44,11 +44,17 @@ if (window.location.hostname.split('.ebay')[0] == 'stores') {
 	cells = document.getElementsByClassName('image');
 } else {
 	// loop through all the items listed on the page
-	var lResultSet = document.getElementById('srp-river-results');
+	var lResultSet = document.getElementById('ResultSetItems');
+    if (lResultSet == undefined) {
+        lResultSet = document.getElementById('srp-river-results');
+    }
 
 	// only install if we've found a ResultSet
 	if (lResultSet != null){
-		cells = lResultSet.getElementsByClassName('s-item');
+		cells = lResultSet.getElementsByClassName('sresult');
+        if (cells.length == 0) {
+            cells = lResultSet.getElementsByClassName('s-item');
+        }
 	}
 }
 
@@ -62,14 +68,10 @@ var tmp = document.getElementById('gh-ug');
 if (tmp != null && tmp.innerHTML.indexOf('SignIn') < 0 && numCells > 0)
 {
 	// put placeholder "loading..." elements in while the script does its thing
-	var newHTML = '<br /><input disabled="disabled" value="wait..." type="image" src="' + placeholderImg + '" />';
+	var newHTML = '<br /><input disabled="disabled" value="wait..." type="image" src="' + placeholderImg + '" style="position: absolute; top:0; left:0;" />';
 	for (var c = 0; c < numCells; c++)
 	{
-		var lATag = cells[c].getElementsByClassName('s-item__link')[0];
-//			anchor = cells[c].getElementsByTagName('a')[0];
-		if (lATag != null) {
-			cells[c].innerHTML += newHTML;
-		}
+        cells[c].innerHTML += newHTML;
 	}
 
 	// request the "my ebay" page
@@ -106,7 +108,7 @@ if (tmp != null && tmp.innerHTML.indexOf('SignIn') < 0 && numCells > 0)
 						var anchorID = 'xyz_anchor_' + i;
 						var title = onWatchPage ? watchedTitle : unwatchedTitle;
 
-						newHTML  = '<a href="javascript:void(0)" id="' + anchorID + '"><img id="' + imageID + '" name="' + imageID + '" src="' + (onWatchPage ? watchedImg : unwatchedImg) + '" title="' + title + '" /><input id="' + statusID + '" name="' + statusID + '" type="hidden" value="' + onWatchPage + '" /><input id="' + itemID + '" name="' + itemID + '" type="hidden" value="' + id + '" /></a>';
+						newHTML  = '<a href="javascript:void(0)" id="' + anchorID + '" style="position: absolute; top:0; left:0;"><img id="' + imageID + '" name="' + imageID + '" src="' + (onWatchPage ? watchedImg : unwatchedImg) + '" title="' + title + '" /><input id="' + statusID + '" name="' + statusID + '" type="hidden" value="' + onWatchPage + '" /><input id="' + itemID + '" name="' + itemID + '" type="hidden" value="' + id + '" /></a>';
 
 						// hide "loading..." element
 						tmp = cells[i].getElementsByTagName('input');
